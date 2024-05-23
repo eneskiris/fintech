@@ -1,20 +1,20 @@
+import Colors from "@/constants/Colors";
+import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
+import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import "react-native-reanimated";
-import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { StatusBar } from "expo-status-bar";
-import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserInactivityProvider } from "@/context/UserInactivity";
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 const queryClient = new QueryClient();
 
 // Cache the Clerk JWT
@@ -43,7 +43,7 @@ export {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-function InitialLayout() {
+const InitialLayout = () => {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
@@ -54,9 +54,7 @@ function InitialLayout() {
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
   }, [error]);
 
   useEffect(() => {
@@ -66,9 +64,7 @@ function InitialLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     const inAuthGroup = segments[0] === "(authenticated)";
 
@@ -104,6 +100,7 @@ function InitialLayout() {
           ),
         }}
       />
+
       <Stack.Screen
         name="login"
         options={{
@@ -129,10 +126,12 @@ function InitialLayout() {
           ),
         }}
       />
+
       <Stack.Screen
         name="help"
         options={{ title: "Help", presentation: "modal" }}
       />
+
       <Stack.Screen
         name="verify/[phone]"
         options={{
@@ -182,9 +181,23 @@ function InitialLayout() {
         name="(authenticated)/(modals)/lock"
         options={{ headerShown: false, animation: "none" }}
       />
+      <Stack.Screen
+        name="(authenticated)/(modals)/account"
+        options={{
+          presentation: "transparentModal",
+          animation: "fade",
+          title: "",
+          headerTransparent: true,
+          headerLeft: () => (
+            <TouchableOpacity onPress={router.back}>
+              <Ionicons name="close-outline" size={34} color={"#fff"} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
-}
+};
 
 const RootLayoutNav = () => {
   return (
